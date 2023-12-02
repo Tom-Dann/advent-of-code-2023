@@ -13,3 +13,4 @@ Go to the relevant day's folder and run the `main.go` solution
 ## Table of Contents
 
 - [`Day 01`](./day01/) | $\color{yellow}{**}$
+- [`Day 02`](./day02/) | $\color{yellow}{**}$
