@@ -5,7 +5,8 @@
 
 ## Running Solutions
 
-Go to the relevant day's folder and run the `main.go` solution
+Save the input file as `input.txt` under in the corresponding day's folder (e.g. `day01/input.txt`).
+Then go to that folder and run the `main.go` solution
 
     % cd day01
     % go run .
