@@ -38,19 +38,20 @@ func handType(card string, jokers bool) int {
 	sort.Slice(counts, func(i, j int) bool { // Sort in descending order
 		return counts[i] > counts[j]
 	})
-	if counts[0]+jokerCount == 5 {
+	counts[0] += jokerCount
+	if counts[0] == 5 {
 		return 7 // Five-of-a-kind
 	}
-	if counts[0]+jokerCount == 4 {
+	if counts[0] == 4 {
 		return 6 // Four-of-a-kind
 	}
-	if counts[0]+jokerCount == 3 {
+	if counts[0] == 3 {
 		if counts[1] == 2 {
 			return 5 // Full house
 		}
 		return 4 // Three-of-a-kind
 	}
-	if counts[0]+jokerCount == 2 {
+	if counts[0] == 2 {
 		if counts[1] == 2 {
 			return 3 // Two pair
 		}
@@ -67,7 +68,7 @@ func cardVal(card byte, jokers bool) int {
 	return strings.Index(ordering, string(card))
 }
 
-func compareCards(a Hand, b Hand, jokers bool) bool {
+func compareHands(a Hand, b Hand, jokers bool) bool {
 	if a.Type > b.Type { // First hand is better
 		return false
 	}
@@ -106,24 +107,24 @@ func solve() {
 	check(err)
 	input := strings.Split(strings.TrimSpace(string(raw)), "\n")
 
-	cards1 := make([]Hand, len(input)) // Cards for part 1
-	cards2 := make([]Hand, len(input)) // Cards for part 2
+	hands1 := make([]Hand, len(input)) // Cards for part 1
+	hands2 := make([]Hand, len(input)) // Cards for part 2
 	for i, line := range input {       // Parse cards into a map
 		s := strings.Split(line, " ")
 		n, _ := strconv.Atoi(s[1])
-		cards1[i] = Hand{Cards: s[0], Bid: n, Type: handType(s[0], false)}
-		cards2[i] = Hand{Cards: s[0], Bid: n, Type: handType(s[0], true)}
+		hands1[i] = Hand{Cards: s[0], Bid: n, Type: handType(s[0], false)}
+		hands2[i] = Hand{Cards: s[0], Bid: n, Type: handType(s[0], true)}
 	}
 
-	sort.Slice(cards1, func(i, j int) bool {
-		return compareCards(cards1[i], cards1[j], false)
+	sort.Slice(hands1, func(i, j int) bool {
+		return compareHands(hands1[i], hands1[j], false)
 	})
-	sort.Slice(cards2, func(i, j int) bool {
-		return compareCards(cards2[i], cards2[j], true)
+	sort.Slice(hands2, func(i, j int) bool {
+		return compareHands(hands2[i], hands2[j], true)
 	})
 
-	fmt.Println("Part 1:", totalWinnings(cards1))
-	fmt.Println("Part 2:", totalWinnings(cards2))
+	fmt.Println("Part 1:", totalWinnings(hands1))
+	fmt.Println("Part 2:", totalWinnings(hands2))
 }
 
 func main() {
