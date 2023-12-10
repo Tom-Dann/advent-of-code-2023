@@ -36,23 +36,24 @@ func solve() {
 
 	part1, part2 := 0, 0
 	for _, line := range input {
-		nums := make([][]int, 1)
+		nums := make([]int, 0)
 		for _, s := range strings.Split(line, " ") { // Parse input nums
 			n, _ := strconv.Atoi(s)
-			nums[0] = append(nums[0], n)
+			nums = append(nums, n)
 		}
 
-		for i := 0; !zeroArray(nums[i]); i++ { // Find differences until all zero
-			nums = append(nums, make([]int, 0))
-			for j := 0; j < len(nums[i])-1; j++ {
-				nums[i+1] = append(nums[i+1], nums[i][j+1]-nums[i][j])
+		for i := 0; !zeroArray(nums); i++ { // Find differences until all zero
+			next := make([]int, 0)
+			for j := 0; j < len(nums)-1; j++ {
+				next = append(next, nums[j+1]-nums[j])
 			}
-			part1 += nums[i][len(nums[i])-1]
+			part1 += nums[len(nums)-1]
 			if i%2 == 0 {
-				part2 += nums[i][0]
+				part2 += nums[0]
 			} else {
-				part2 -= nums[i][0]
+				part2 -= nums[0]
 			}
+			nums = next
 		}
 	}
 
