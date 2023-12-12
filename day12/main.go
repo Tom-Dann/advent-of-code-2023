@@ -41,18 +41,13 @@ func sum(arr []int) int {
 
 var cache = make(map[string]int) // Cache of comibation counts to speed things up
 
-func countArragements(gears string, counts []int) int {
-	check := gears + strings.Join(strings.Fields(fmt.Sprint(counts)), ",")
-	n, cached := cache[check]
+func count(gears string, counts []int) int {
+	key := gears + strings.Join(strings.Fields(fmt.Sprint(counts)), ",")
+	n, cached := cache[key]
 	if cached { // Cache hit
 		return n
 	}
-	n = count(gears, counts)
-	cache[check] = n
-	return n
-}
 
-func count(gears string, counts []int) int {
 	if len(counts) == 0 {
 		if strings.Contains(gears, "#") {
 			return 0
@@ -62,7 +57,7 @@ func count(gears string, counts []int) int {
 
 	minGears := len(counts) + sum(counts) - 1
 	total := 0
-	for i := 0; len(gears)-i >= minGears; i++ {
+	for i := 0; i <= len(gears)-minGears; i++ {
 		if i > 0 && gears[i-1] == '#' {
 			break
 		}
@@ -70,10 +65,11 @@ func count(gears string, counts []int) int {
 			if i+counts[0] == len(gears) && len(counts) == 1 {
 				total++
 			} else if gears[i+counts[0]] != '#' {
-				total += countArragements(gears[i+counts[0]+1:], counts[1:])
+				total += count(gears[i+counts[0]+1:], counts[1:])
 			}
 		}
 	}
+	cache[key] = total
 	return total
 }
 
@@ -85,13 +81,13 @@ func solve() {
 	part1, part2 := 0, 0
 	for _, line := range lines {
 		gears, counts := parse(line)
-		part1 += countArragements(gears, counts)
+		part1 += count(gears, counts)
 		newGears, newCounts := gears, counts
 		for i := 1; i < 5; i++ {
 			newGears += "?" + gears
 			newCounts = append(newCounts, counts...)
 		}
-		part2 += countArragements(newGears, newCounts)
+		part2 += count(newGears, newCounts)
 	}
 
 	fmt.Println("Part 1:", part1)
