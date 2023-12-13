@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"slices"
 	"strings"
 	"time"
 )
@@ -40,20 +41,26 @@ func diffStrings(a string, b string) int {
 
 func scoreGrid(grid []string) []int {
 	scores := make([]int, 2)
-	for i := 0; i < len(grid)-1; i++ { // Check rows
+	for i := 0; i < len(grid)-1 && slices.Contains(scores, 0); i++ { // Check rows
 		diff := 0
 		for j := i; j >= 0 && len(grid)+j > 2*i+1; j-- {
 			diff += diffStrings(grid[j], grid[2*i-j+1])
+			if diff > 1 {
+				break
+			}
 		}
 		if diff <= 1 {
 			scores[diff] = (i + 1) * 100
 		}
 	}
 
-	for i := 0; i < len(grid[0])-1; i++ { // Check columns
+	for i := 0; i < len(grid[0])-1 && slices.Contains(scores, 0); i++ { // Check columns
 		diff := 0
 		for j := i; j >= 0 && len(grid[0])+j > 2*i+1; j-- {
 			diff += diffStrings(getColumn(grid, j), getColumn(grid, 2*i-j+1))
+			if diff > 1 {
+				break
+			}
 		}
 		if diff <= 1 {
 			scores[diff] = i + 1
