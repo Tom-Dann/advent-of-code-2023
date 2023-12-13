@@ -38,18 +38,15 @@ func diffStrings(a string, b string) int {
 	return diff
 }
 
-func scoreGrid(grid []string) (int, int) {
-	part1, part2 := 0, 0
+func scoreGrid(grid []string) []int {
+	scores := make([]int, 2)
 	for i := 0; i < len(grid)-1; i++ { // Check rows
 		diff := 0
 		for j := i; j >= 0 && len(grid)+j > 2*i+1; j-- {
 			diff += diffStrings(grid[j], grid[2*i-j+1])
 		}
-		switch diff {
-		case 0:
-			part1 = (i + 1) * 100
-		case 1:
-			part2 = (i + 1) * 100
+		if diff <= 1 {
+			scores[diff] = (i + 1) * 100
 		}
 	}
 
@@ -58,14 +55,11 @@ func scoreGrid(grid []string) (int, int) {
 		for j := i; j >= 0 && len(grid[0])+j > 2*i+1; j-- {
 			diff += diffStrings(getColumn(grid, j), getColumn(grid, 2*i-j+1))
 		}
-		switch diff {
-		case 0:
-			part1 = i + 1
-		case 1:
-			part2 = i + 1
+		if diff <= 1 {
+			scores[diff] = i + 1
 		}
 	}
-	return part1, part2
+	return scores
 }
 
 func solve() {
@@ -76,9 +70,9 @@ func solve() {
 	part1, part2 := 0, 0
 	for _, section := range sections {
 		grid := strings.Split(strings.TrimSpace(section), "\n")
-		a, b := scoreGrid(grid)
-		part1 += a
-		part2 += b
+		scores := scoreGrid(grid)
+		part1 += scores[0]
+		part2 += scores[1]
 	}
 
 	fmt.Println("Part 1:", part1)
