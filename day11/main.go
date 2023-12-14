@@ -2,23 +2,10 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"regexp"
 	"strings"
-	"time"
+	"utils"
 )
-
-func check(e error) {
-	if e != nil {
-		panic(e)
-	}
-}
-
-func timeFunction(function func()) {
-	start := time.Now()
-	function()
-	fmt.Println("Time elapsed:", time.Since(start))
-}
 
 type Point struct {
 	x, y int
@@ -46,9 +33,7 @@ func countElements(arr []int, a int, b int) int {
 }
 
 func solve() {
-	raw, err := os.ReadFile("input.txt") // Read file
-	check(err)
-	lines := strings.Split(strings.TrimSpace(string(raw)), "\n")
+	lines := utils.ReadInput("input.txt", "\n")
 
 	emptyRows, emptyCols := make([]int, 0), make([]int, 0)
 	galaxies := make([]Point, 0)
@@ -102,5 +87,5 @@ func solve() {
 }
 
 func main() {
-	timeFunction(solve)
+	utils.TimeFunction(solve)
 }

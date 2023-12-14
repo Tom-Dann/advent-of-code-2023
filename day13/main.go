@@ -2,23 +2,10 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"slices"
 	"strings"
-	"time"
+	"utils"
 )
-
-func check(e error) {
-	if e != nil {
-		panic(e)
-	}
-}
-
-func timeFunction(function func()) {
-	start := time.Now()
-	function()
-	fmt.Println("Time elapsed:", time.Since(start))
-}
 
 func getColumn(grid []string, n int) string {
 	col := ""
@@ -70,9 +57,7 @@ func scoreGrid(grid []string) []int {
 }
 
 func solve() {
-	raw, err := os.ReadFile("input.txt") // Read file
-	check(err)
-	sections := strings.Split(strings.TrimSpace(string(raw)), "\n\n")
+	sections := utils.ReadInput("input.txt", "\n\n")
 
 	part1, part2 := 0, 0
 	for _, section := range sections {
@@ -87,5 +72,5 @@ func solve() {
 }
 
 func main() {
-	timeFunction(solve)
+	utils.TimeFunction(solve)
 }

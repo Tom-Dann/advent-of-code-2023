@@ -2,28 +2,13 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"regexp"
 	"strings"
-	"time"
+	"utils"
 )
 
-func check(e error) {
-	if e != nil {
-		panic(e)
-	}
-}
-
-func timeFunction(function func()) {
-	start := time.Now()
-	function()
-	fmt.Println("Time elapsed:", time.Since(start))
-}
-
 func solve() {
-	raw, err := os.ReadFile("input.txt") // Read file
-	check(err)
-	cards := strings.Split(strings.TrimSpace(string(raw)), "\n")
+	cards := utils.ReadInput("input.txt", "\n")
 
 	part1, part2 := 0, 0
 	cardCount := make([]int, len(cards))
@@ -54,5 +39,5 @@ func solve() {
 }
 
 func main() {
-	timeFunction(solve)
+	utils.TimeFunction(solve)
 }

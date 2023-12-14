@@ -2,28 +2,14 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"strings"
-	"time"
+	"utils"
 )
 
-func check(e error) {
-	if e != nil {
-		panic(e)
-	}
+type Point struct {
+	x, y int
 }
-
-func timeFunction(function func()) {
-	start := time.Now()
-	function()
-	fmt.Println("Time elapsed:", time.Since(start))
-}
-
-type Point2D struct {
-	X, Y int
-}
-
-type PointSet map[Point2D]struct{}
+type PointSet map[Point]struct{}
 
 var connections = struct{ N, E, S, W string }{
 	N: "S|LJ",
@@ -34,27 +20,27 @@ var connections = struct{ N, E, S, W string }{
 
 func floodFill(grid [][]rune, visited PointSet, toCheck PointSet) (PointSet, PointSet) {
 	next := make(PointSet)
-	checkPoint := func(point Point2D, direction string) {
+	checkPoint := func(point Point, direction string) {
 		_, checked := visited[point]
-		if !checked && strings.Contains(direction, string(grid[point.Y][point.X])) {
+		if !checked && strings.Contains(direction, string(grid[point.y][point.x])) {
 			visited[point] = struct{}{}
 			next[point] = struct{}{}
 		}
 	}
 
 	for curr := range toCheck {
-		symbol := grid[curr.Y][curr.X]
-		if strings.Contains(connections.N, string(symbol)) && curr.Y > 0 { // North
-			checkPoint(Point2D{X: curr.X, Y: curr.Y - 1}, connections.S)
+		symbol := grid[curr.y][curr.x]
+		if strings.Contains(connections.N, string(symbol)) && curr.y > 0 { // North
+			checkPoint(Point{x: curr.x, y: curr.y - 1}, connections.S)
 		}
-		if strings.Contains(connections.E, string(symbol)) && curr.X < len(grid[0])-1 { // East
-			checkPoint(Point2D{X: curr.X + 1, Y: curr.Y}, connections.W)
+		if strings.Contains(connections.E, string(symbol)) && curr.x < len(grid[0])-1 { // East
+			checkPoint(Point{x: curr.x + 1, y: curr.y}, connections.W)
 		}
-		if strings.Contains(connections.S, string(symbol)) && curr.Y < len(grid)-1 { // South
-			checkPoint(Point2D{X: curr.X, Y: curr.Y + 1}, connections.N)
+		if strings.Contains(connections.S, string(symbol)) && curr.y < len(grid)-1 { // South
+			checkPoint(Point{x: curr.x, y: curr.y + 1}, connections.N)
 		}
-		if strings.Contains(connections.W, string(symbol)) && curr.X > 0 { // West
-			checkPoint(Point2D{X: curr.X - 1, Y: curr.Y}, connections.E)
+		if strings.Contains(connections.W, string(symbol)) && curr.x > 0 { // West
+			checkPoint(Point{x: curr.x - 1, y: curr.y}, connections.E)
 		}
 	}
 	return visited, next
@@ -77,16 +63,14 @@ func rotate(facing rune, turn rune) int {
 }
 
 func solve() {
-	raw, err := os.ReadFile("input.txt") // Read file
-	check(err)
-	lines := strings.Split(strings.TrimSpace(string(raw)), "\n")
+	lines := utils.ReadInput("input.txt", "\n")
 
-	var source Point2D
+	var source Point
 	grid := make([][]rune, len(lines))
 	for i, line := range lines { // Setup grid
 		grid[i] = []rune(line)
 		if strings.Contains(line, "S") { // Find source
-			source = Point2D{X: strings.Index(line, "S"), Y: i}
+			source = Point{x: strings.Index(line, "S"), y: i}
 		}
 	}
 
@@ -104,20 +88,20 @@ func solve() {
 	// Traverse pipe
 	for !finished {
 		moved := false
-		goNext := func(point Point2D, connection string, turn rune) {
-			if strings.Contains(connection, string(grid[point.Y][point.X])) {
+		goNext := func(point Point, connection string, turn rune) {
+			if strings.Contains(connection, string(grid[point.y][point.x])) {
 				dir := rotate(facing, turn)
 				rotation += dir
-				var surround []Point2D
+				var surround []Point
 				switch facing {
 				case 'N':
-					surround = []Point2D{{X: current.X - 1, Y: current.Y}, {X: current.X, Y: current.Y - 1}, {X: current.X + 1, Y: current.Y}}
+					surround = []Point{{x: current.x - 1, y: current.y}, {x: current.x, y: current.y - 1}, {x: current.x + 1, y: current.y}}
 				case 'E':
-					surround = []Point2D{{X: current.X, Y: current.Y - 1}, {X: current.X + 1, Y: current.Y}, {X: current.X, Y: current.Y + 1}}
+					surround = []Point{{x: current.x, y: current.y - 1}, {x: current.x + 1, y: current.y}, {x: current.x, y: current.y + 1}}
 				case 'S':
-					surround = []Point2D{{X: current.X + 1, Y: current.Y}, {X: current.X, Y: current.Y + 1}, {X: current.X - 1, Y: current.Y}}
+					surround = []Point{{x: current.x + 1, y: current.y}, {x: current.x, y: current.y + 1}, {x: current.x - 1, y: current.y}}
 				case 'W':
-					surround = []Point2D{{X: current.X, Y: current.Y + 1}, {X: current.X - 1, Y: current.Y}, {X: current.X, Y: current.Y - 1}}
+					surround = []Point{{x: current.x, y: current.y + 1}, {x: current.x - 1, y: current.y}, {x: current.x, y: current.y - 1}}
 				}
 				_, pipe0 := visited[surround[0]]
 				_, pipe1 := visited[surround[1]]
@@ -140,18 +124,18 @@ func solve() {
 			}
 		}
 
-		symbol := string(grid[current.Y][current.X])
-		if strings.Contains(connections.N, symbol) && facing != 'S' && current.Y > 0 { // North
-			goNext(Point2D{X: current.X, Y: current.Y - 1}, connections.S, 'N')
+		symbol := string(grid[current.y][current.x])
+		if strings.Contains(connections.N, symbol) && facing != 'S' && current.y > 0 { // North
+			goNext(Point{x: current.x, y: current.y - 1}, connections.S, 'N')
 		}
-		if strings.Contains(connections.E, symbol) && facing != 'W' && current.X < len(grid[0])-1 && !moved { // East
-			goNext(Point2D{X: current.X + 1, Y: current.Y}, connections.W, 'E')
+		if strings.Contains(connections.E, symbol) && facing != 'W' && current.x < len(grid[0])-1 && !moved { // East
+			goNext(Point{x: current.x + 1, y: current.y}, connections.W, 'E')
 		}
-		if strings.Contains(connections.S, symbol) && facing != 'N' && current.Y < len(grid)-1 && !moved { // South
-			goNext(Point2D{X: current.X, Y: current.Y + 1}, connections.N, 'S')
+		if strings.Contains(connections.S, symbol) && facing != 'N' && current.y < len(grid)-1 && !moved { // South
+			goNext(Point{x: current.x, y: current.y + 1}, connections.N, 'S')
 		}
-		if strings.Contains(connections.W, symbol) && facing != 'E' && current.X > 0 && !moved { // West
-			goNext(Point2D{X: current.X - 1, Y: current.Y}, connections.E, 'W')
+		if strings.Contains(connections.W, symbol) && facing != 'E' && current.x > 0 && !moved { // West
+			goNext(Point{x: current.x - 1, y: current.y}, connections.E, 'W')
 		}
 
 		if current == source {
@@ -167,11 +151,11 @@ func solve() {
 		for point := range toCheck {
 			inside[point] = struct{}{}
 			delete(toCheck, point)
-			adjacent := []Point2D{
-				{X: point.X, Y: point.Y - 1}, // North
-				{X: point.X + 1, Y: point.Y}, // East
-				{X: point.X, Y: point.Y + 1}, // South
-				{X: point.X - 1, Y: point.Y}, // West
+			adjacent := []Point{
+				{x: point.x, y: point.y - 1}, // North
+				{x: point.x + 1, y: point.y}, // East
+				{x: point.x, y: point.y + 1}, // South
+				{x: point.x - 1, y: point.y}, // West
 			}
 			for _, check := range adjacent {
 				_, pipe := visited[check]
@@ -186,5 +170,5 @@ func solve() {
 }
 
 func main() {
-	timeFunction(solve)
+	utils.TimeFunction(solve)
 }

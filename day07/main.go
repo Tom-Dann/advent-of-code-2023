@@ -2,24 +2,11 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"sort"
 	"strconv"
 	"strings"
-	"time"
+	"utils"
 )
-
-func check(e error) {
-	if e != nil {
-		panic(e)
-	}
-}
-
-func timeFunction(function func()) {
-	start := time.Now()
-	function()
-	fmt.Println("Time elapsed:", time.Since(start))
-}
 
 func handType(card string, jokers bool) int {
 	cardCount := make(map[rune]int)
@@ -103,9 +90,7 @@ type Hand struct {
 }
 
 func solve() {
-	raw, err := os.ReadFile("input.txt") // Read file
-	check(err)
-	input := strings.Split(strings.TrimSpace(string(raw)), "\n")
+	input := utils.ReadInput("input.txt", "\n")
 
 	hands1 := make([]Hand, len(input)) // Cards for part 1
 	hands2 := make([]Hand, len(input)) // Cards for part 2
@@ -128,5 +113,5 @@ func solve() {
 }
 
 func main() {
-	timeFunction(solve)
+	utils.TimeFunction(solve)
 }

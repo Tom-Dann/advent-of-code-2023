@@ -2,23 +2,9 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"reflect"
-	"strings"
-	"time"
+	"utils"
 )
-
-func check(e error) {
-	if e != nil {
-		panic(e)
-	}
-}
-
-func timeFunction(function func()) {
-	start := time.Now()
-	function()
-	fmt.Println("Time elapsed:", time.Since(start))
-}
 
 type Rock struct {
 	x, y int
@@ -74,9 +60,7 @@ func totalLoad(rocks RockSet, max int) int {
 }
 
 func solve() {
-	raw, err := os.ReadFile("input.txt") // Read file
-	check(err)
-	lines := strings.Split(strings.TrimSpace(string(raw)), "\n")
+	lines := utils.ReadInput("input.txt", "\n")
 
 	cubes, rounds := make(RockSet), make(RockSet)
 	for j, line := range lines { // Parse input
@@ -119,5 +103,5 @@ func solve() {
 }
 
 func main() {
-	timeFunction(solve)
+	utils.TimeFunction(solve)
 }

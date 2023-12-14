@@ -2,23 +2,10 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"strconv"
 	"strings"
-	"time"
+	"utils"
 )
-
-func check(e error) {
-	if e != nil {
-		panic(e)
-	}
-}
-
-func timeFunction(function func()) {
-	start := time.Now()
-	function()
-	fmt.Println("Time elapsed:", time.Since(start))
-}
 
 func zeroArray(arr []int) bool {
 	for _, n := range arr {
@@ -30,10 +17,7 @@ func zeroArray(arr []int) bool {
 }
 
 func solve() {
-	raw, err := os.ReadFile("input.txt") // Read file
-	check(err)
-	input := strings.Split(strings.TrimSpace(string(raw)), "\n")
-
+	input := utils.ReadInput("input.txt", "\n")
 	part1, part2 := 0, 0
 	for _, line := range input {
 		nums := make([]int, 0)
@@ -62,5 +46,5 @@ func solve() {
 }
 
 func main() {
-	timeFunction(solve)
+	utils.TimeFunction(solve)
 }

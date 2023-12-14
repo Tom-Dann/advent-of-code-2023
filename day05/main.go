@@ -2,23 +2,10 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"strconv"
 	"strings"
-	"time"
+	"utils"
 )
-
-func check(e error) {
-	if e != nil {
-		panic(e)
-	}
-}
-
-func timeFunction(function func([]string), input []string) {
-	start := time.Now()
-	function(input)
-	fmt.Println("Time elapsed:", time.Since(start))
-}
 
 func part1(sections []string) {
 	var part1 int
@@ -114,10 +101,7 @@ func part2(sections []string) {
 }
 
 func main() {
-	raw, err := os.ReadFile("input.txt") // Read file
-	check(err)
-	sections := strings.Split(strings.TrimSpace(string(raw)), "\n\n")
-
-	timeFunction(part1, sections)
-	timeFunction(part2, sections)
+	sections := utils.ReadInput("input.txt", "\n\n")
+	utils.TimeFunctionInput(part1, sections)
+	utils.TimeFunctionInput(part2, sections)
 }

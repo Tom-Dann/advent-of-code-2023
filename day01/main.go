@@ -2,34 +2,15 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"strconv"
-	"strings"
-	"time"
+	"utils"
 )
-
-func check(e error) {
-	if e != nil {
-		panic(e)
-	}
-}
-
-func timeFunction(function func()) {
-	start := time.Now()
-	function()
-	fmt.Println("Time elapsed:", time.Since(start))
-}
 
 func checkCharIsNumber(c byte) bool {
 	return '0' <= c && c <= '9'
 }
 
-func part1() {
-	// Read file
-	raw, err := os.ReadFile("input.txt")
-	check(err)
-	lines := strings.Split(strings.TrimSpace(string(raw)), "\n")
-
+func part1(lines []string) {
 	sum := 0
 	for _, line := range lines {
 		numBytes := make([]byte, 2)
@@ -45,19 +26,13 @@ func part1() {
 				break
 			}
 		}
-		num, err := strconv.Atoi(string(numBytes))
-		check(err)
+		num, _ := strconv.Atoi(string(numBytes))
 		sum += num
 	}
 	fmt.Println("Part 1:", sum)
 }
 
-func part2() {
-	// Read file
-	raw, err := os.ReadFile("input.txt")
-	check(err)
-	lines := strings.Split(strings.TrimSpace(string(raw)), "\n")
-
+func part2(lines []string) {
 	// Numbers as strings :)
 	numberStrings := [9]string{"one", "two", "three", "four", "five", "six", "seven", "eight", "nine"}
 
@@ -100,14 +75,14 @@ func part2() {
 				break
 			}
 		}
-		num, err := strconv.Atoi(string(numBytes))
-		check(err)
+		num, _ := strconv.Atoi(string(numBytes))
 		sum += num
 	}
 	fmt.Println("Part 2:", sum)
 }
 
 func main() {
-	timeFunction(part1)
-	timeFunction(part2)
+	input := utils.ReadInput("input.txt", "\n")
+	utils.TimeFunctionInput(part1, input)
+	utils.TimeFunctionInput(part2, input)
 }

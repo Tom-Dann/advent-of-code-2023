@@ -2,23 +2,10 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"regexp"
 	"strings"
-	"time"
+	"utils"
 )
-
-func check(e error) {
-	if e != nil {
-		panic(e)
-	}
-}
-
-func timeFunction(function func()) {
-	start := time.Now()
-	function()
-	fmt.Println("Time elapsed:", time.Since(start))
-}
 
 type nodeMap struct {
 	Left  string
@@ -67,9 +54,7 @@ func lcm(a int, b int) int {
 }
 
 func solve() {
-	raw, err := os.ReadFile("input.txt") // Read file
-	check(err)
-	sections := strings.Split(strings.TrimSpace(string(raw)), "\n\n")
+	sections := utils.ReadInput("input.txt", "\n\n")
 
 	lr := sections[0]
 	paths := make(map[string][]string)
@@ -95,5 +80,5 @@ func solve() {
 }
 
 func main() {
-	timeFunction(solve)
+	utils.TimeFunction(solve)
 }

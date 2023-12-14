@@ -2,30 +2,14 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"regexp"
 	"strconv"
 	"strings"
-	"time"
+	"utils"
 )
 
-func check(e error) {
-	if e != nil {
-		panic(e)
-	}
-}
-
-func timeFunction(function func()) {
-	start := time.Now()
-	function()
-	fmt.Println("Time elapsed:", time.Since(start))
-}
-
 func solve() {
-	// Read file
-	raw, err := os.ReadFile("input.txt")
-	check(err)
-	lines := strings.Split(strings.TrimSpace(string(raw)), "\n")
+	lines := utils.ReadInput("input.txt", "\n")
 
 	part1 := 0
 	re := regexp.MustCompile(`(\d+)`)
@@ -69,5 +53,5 @@ func solve() {
 }
 
 func main() {
-	timeFunction(solve)
+	utils.TimeFunction(solve)
 }

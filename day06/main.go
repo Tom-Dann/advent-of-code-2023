@@ -3,24 +3,11 @@ package main
 import (
 	"fmt"
 	"math"
-	"os"
 	"regexp"
 	"strconv"
 	"strings"
-	"time"
+	"utils"
 )
-
-func check(e error) {
-	if e != nil {
-		panic(e)
-	}
-}
-
-func timeFunction(function func()) {
-	start := time.Now()
-	function()
-	fmt.Println("Time elapsed:", time.Since(start))
-}
 
 func calc(t int, d int) int {
 	delta := math.Sqrt(float64((t * t) - (4 * d))) // Root of discriminant in quadratic formula
@@ -35,10 +22,7 @@ func parseNum(s string) int {
 }
 
 func solve() {
-	raw, err := os.ReadFile("input.txt") // Read file
-	check(err)
-	input := strings.Split(strings.TrimSpace(string(raw)), "\n")
-
+	input := utils.ReadInput("input.txt", "\n")
 	re := regexp.MustCompile(`\d+`)
 	times := re.FindAllString(input[0], -1)
 	distances := re.FindAllString(input[1], -1)
@@ -56,5 +40,5 @@ func solve() {
 }
 
 func main() {
-	timeFunction(solve)
+	utils.TimeFunction(solve)
 }

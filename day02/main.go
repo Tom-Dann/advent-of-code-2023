@@ -2,30 +2,13 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"regexp"
 	"strconv"
-	"strings"
-	"time"
+	"utils"
 )
 
-func check(e error) {
-	if e != nil {
-		panic(e)
-	}
-}
-
-func timeFunction(function func()) {
-	start := time.Now()
-	function()
-	fmt.Println("Time elapsed:", time.Since(start))
-}
-
 func solve() {
-	// Read file
-	raw, err := os.ReadFile("input.txt")
-	check(err)
-	lines := strings.Split(strings.TrimSpace(string(raw)), "\n")
+	lines := utils.ReadInput("input.txt", "\n")
 
 	max := map[string]int{"red": 12, "green": 13, "blue": 14}
 	part1sum, part2sum := 0, 0
@@ -35,8 +18,7 @@ func solve() {
 		possible := true
 		gameMax := map[string]int{"red": 0, "green": 0, "blue": 0}
 		for _, cube := range cubes {
-			n, err := strconv.Atoi(cube[1])
-			check(err)
+			n, _ := strconv.Atoi(cube[1])
 			if n > max[cube[2]] { // Part1 - Check if max is exceeded
 				possible = false
 			}
@@ -55,5 +37,5 @@ func solve() {
 }
 
 func main() {
-	timeFunction(solve)
+	utils.TimeFunction(solve)
 }
