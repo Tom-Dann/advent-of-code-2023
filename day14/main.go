@@ -80,7 +80,7 @@ func solve() {
 	size := len(lines)
 	part1 := totalLoad(tilt(rounds, cubes, size), size)
 
-	repeating, settleTime := false, 1000
+	repeating, settleTime := false, 100
 	history, loads := make(RockSet), make([]int, 0)
 	for i := 0; !repeating; i++ {
 		if i == settleTime {
@@ -91,7 +91,7 @@ func solve() {
 		rounds, cubes = spinCycle(rounds, cubes, size)
 		if i >= settleTime {
 			loads = append(loads, totalLoad(rounds, size))
-			if reflect.DeepEqual(history, rounds) { // Check if equal to the 1000th rock arrangement
+			if reflect.DeepEqual(history, rounds) { // Check if equal to the 100th rock arrangement
 				repeating = true
 			}
 		}
