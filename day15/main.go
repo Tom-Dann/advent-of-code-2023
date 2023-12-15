@@ -38,21 +38,21 @@ func part2(input []string) {
 	for _, s := range input {
 		if strings.Contains(s, "-") {
 			label := strings.Split(s, "-")[0]
-			n := hash(label)
-			index := slices.IndexFunc(boxes[n], checkLabel(label))
-			if index >= 0 {
-				boxes[n] = append(boxes[n][:index], boxes[n][index+1:]...)
+			hash := hash(label)
+			slot := slices.IndexFunc(boxes[hash], checkLabel(label))
+			if slot >= 0 {
+				boxes[hash] = append(boxes[hash][:slot], boxes[hash][slot+1:]...)
 			}
 		} else {
 			split := strings.Split(s, "=")
 			label := split[0]
 			focus, _ := strconv.Atoi(split[1])
-			n := hash(label)
-			index := slices.IndexFunc(boxes[n], checkLabel(label))
-			if index >= 0 {
-				boxes[n][index].Focus = focus
+			hash := hash(label)
+			slot := slices.IndexFunc(boxes[hash], checkLabel(label))
+			if slot >= 0 {
+				boxes[hash][slot].Focus = focus
 			} else {
-				boxes[n] = append(boxes[n], Lense{Label: label, Focus: focus})
+				boxes[hash] = append(boxes[hash], Lense{label, focus})
 			}
 		}
 	}
