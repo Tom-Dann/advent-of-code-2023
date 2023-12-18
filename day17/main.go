@@ -1,42 +1,82 @@
 package main
 
 import (
+	"container/heap"
 	"fmt"
-	"math"
 	"utils"
 )
 
 type Position struct {
-	x, y int
-	dir  rune
-	len  int
+	x, y, dir, len int
 }
 
-func getNeightbour(b Position, dir rune, part int) Position {
-	block := b
-	if map[rune]rune{'E': 'W', 'S': 'N', 'W': 'E', 'N': 'S'}[block.dir] == dir { // Not allowed to doube back
-		return Position{-1, -1, '-', 0}
-	}
-	if part == 2 && block.len <= 3 && block.dir != dir && block.dir != 'O' { // Must go a min of 4 in same direction in part 2
-		return Position{-1, -1, '-', 0}
-	}
+// Priority Queue implementation https://pkg.go.dev/container/heap
+type Item struct {
+	position Position
+	dist     int // The priority of the item in the queue.
+	index    int // The index of the item in the heap.
+}
+type PriorityQueue []*Item
+
+func (pq PriorityQueue) Len() int           { return len(pq) }
+func (pq PriorityQueue) Less(i, j int) bool { return pq[i].dist < pq[j].dist }
+func (pq PriorityQueue) Swap(i, j int) {
+	pq[i], pq[j] = pq[j], pq[i]
+	pq[i].index = i
+	pq[j].index = j
+}
+func (pq *PriorityQueue) Push(x any) {
+	n := len(*pq)
+	item := x.(*Item)
+	item.index = n
+	*pq = append(*pq, item)
+}
+func (pq *PriorityQueue) Pop() any {
+	old := *pq
+	n := len(old)
+	item := old[n-1]
+	old[n-1] = nil  // avoid memory leak
+	item.index = -1 // for safety
+	*pq = old[0 : n-1]
+	return item
+}
+func (pq *PriorityQueue) update(item *Item, dist int) {
+	item.dist = dist
+	heap.Fix(pq, item.index)
+}
+
+func move(p Position, dir int) Position {
 	switch dir {
-	case 'E':
-		block.x++
-	case 'W':
-		block.x--
-	case 'S':
-		block.y++
-	case 'N':
-		block.y--
+	case 0: // East
+		p.x++
+	case 1: // South
+		p.y++
+	case 2: // West
+		p.x--
+	case 3: // North
+		p.y--
 	}
-	if dir == block.dir {
-		block.len++
+	if p.dir == dir {
+		p.len++
 	} else {
-		block.dir = dir
-		block.len = 1
+		p.len = 1
+		p.dir = dir
 	}
-	return block
+	return p
+}
+
+func getNeightbours(pos Position, part int) []Position {
+	if part == 2 && pos.len <= 3 && pos.dir != -1 { // Must go a min of 4 in same direction in part 2
+		b := move(pos, pos.dir)
+		return []Position{b}
+	}
+	var next []Position
+	for dir := 0; dir <= 3; dir++ {
+		if pos.dir-dir%4 != 2 { // Not allowed to doube back
+			next = append(next, move(pos, dir))
+		}
+	}
+	return next
 }
 
 func dijkstra(lines []string, part int) int {
@@ -49,9 +89,11 @@ func dijkstra(lines []string, part int) int {
 			heat[i][j] = int(char) - 48
 		}
 	}
-	start := Position{0, 0, 'O', 0}
+	start := Position{0, 0, -1, 0}
 	heatLoss[start] = 0
-	queue := map[Position]struct{}{start: {}}
+	seen := map[Position]struct{}{}
+	queue := PriorityQueue{&Item{position: start, dist: 0, index: 0}}
+	heap.Init(&queue)
 
 	valid := func(block Position) bool {
 		if block.x < 0 || block.x >= max.width || block.y < 0 || block.y >= max.height {
@@ -63,27 +105,23 @@ func dijkstra(lines []string, part int) int {
 		return block.len <= 10
 	}
 
-	for len(queue) > 0 {
-		var next Position
-		minLoss := math.MaxInt32
-		for block := range queue { // Find min
-			if heatLoss[block] < minLoss {
-				next = block
-				minLoss = heatLoss[block]
-			}
+	for true {
+		next := heap.Pop(&queue).(*Item)
+		_, done := seen[next.position]
+		if done {
+			continue
 		}
-		delete(queue, next)
-		if next.x == max.width-1 && next.y == max.height-1 {
-			return heatLoss[next]
+		seen[next.position] = struct{}{}
+		if next.position.x == max.width-1 && next.position.y == max.height-1 {
+			return next.dist
 		}
-		for _, dir := range []rune{'E', 'S', 'W', 'N'} {
-			neighbour := getNeightbour(next, dir, part)
+		for _, neighbour := range getNeightbours(next.position, part) {
 			if valid(neighbour) {
-				dist := heatLoss[next] + heat[neighbour.y][neighbour.x]
+				dist := next.dist + heat[neighbour.y][neighbour.x]
 				best, visited := heatLoss[neighbour]
 				if !visited || dist < best {
 					heatLoss[neighbour] = dist
-					queue[neighbour] = struct{}{}
+					heap.Push(&queue, &Item{position: neighbour, dist: dist})
 				}
 			}
 		}
