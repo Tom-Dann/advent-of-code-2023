@@ -20,11 +20,7 @@ type PriorityQueue []*Item
 
 func (pq PriorityQueue) Len() int           { return len(pq) }
 func (pq PriorityQueue) Less(i, j int) bool { return pq[i].dist < pq[j].dist }
-func (pq PriorityQueue) Swap(i, j int) {
-	pq[i], pq[j] = pq[j], pq[i]
-	pq[i].index = i
-	pq[j].index = j
-}
+func (pq PriorityQueue) Swap(i, j int)      { pq[i], pq[j] = pq[j], pq[i]; pq[i].index, pq[j].index = i, j }
 func (pq *PriorityQueue) Push(x any) {
 	n := len(*pq)
 	item := x.(*Item)
@@ -40,10 +36,7 @@ func (pq *PriorityQueue) Pop() any {
 	*pq = old[0 : n-1]
 	return item
 }
-func (pq *PriorityQueue) update(item *Item, dist int) {
-	item.dist = dist
-	heap.Fix(pq, item.index)
-}
+func (pq *PriorityQueue) update(item *Item, dist int) { item.dist = dist; heap.Fix(pq, item.index) }
 
 func move(p Position, dir int) Position {
 	switch dir {
@@ -89,10 +82,7 @@ func dijkstra(lines []string, part int) int {
 			heat[i][j] = int(char) - 48
 		}
 	}
-	start := Position{0, 0, -1, 0}
-	heatLoss[start] = 0
-	seen := map[Position]struct{}{}
-	queue := PriorityQueue{&Item{position: start, dist: 0, index: 0}}
+	queue := PriorityQueue{&Item{position: Position{0, 0, -1, 0}, dist: 0, index: 0}}
 	heap.Init(&queue)
 
 	valid := func(block Position) bool {
@@ -105,13 +95,8 @@ func dijkstra(lines []string, part int) int {
 		return block.len <= 10
 	}
 
-	for true {
+	for queue.Len() > 0 {
 		next := heap.Pop(&queue).(*Item)
-		_, done := seen[next.position]
-		if done {
-			continue
-		}
-		seen[next.position] = struct{}{}
 		if next.position.x == max.width-1 && next.position.y == max.height-1 {
 			return next.dist
 		}
