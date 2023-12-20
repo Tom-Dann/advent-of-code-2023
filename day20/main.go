@@ -8,11 +8,10 @@ import (
 )
 
 type Module struct {
-	Type    rune
-	Outputs []string
-	State   bool            // For flip-flop
-	Memory  map[string]bool // For conjunction
-	Last    bool
+	Type        rune
+	Outputs     []string
+	State, Last bool            // For flip-flop
+	Memory      map[string]bool // For conjunction
 }
 type Modules map[string]Module
 
@@ -46,6 +45,14 @@ type Signal struct {
 	Pulse        bool
 }
 
+func getSignals(source string, outputs []string, pulse bool) []Signal {
+	signals := make([]Signal, len(outputs))
+	for i, dest := range outputs {
+		signals[i] = Signal{source, dest, pulse}
+	}
+	return signals
+}
+
 func (modules Modules) sendSignal(signal Signal) {
 	m := modules[signal.Dest]
 	if m.Type == '&' {
@@ -58,30 +65,22 @@ func (modules Modules) sendSignal(signal Signal) {
 
 func (modules Modules) process(name string) []Signal {
 	curr := modules[name]
-	queue := []Signal{}
 	switch curr.Type {
 	case '%':
 		if !curr.Last { // Low pulse
 			curr.State = !curr.State
-			for _, output := range curr.Outputs {
-				queue = append(queue, Signal{name, output, curr.State})
-			}
 			modules[name] = curr
+			return getSignals(name, curr.Outputs, curr.State)
 		}
+		return []Signal{}
 	case '&':
 		pulse := true
 		for _, v := range curr.Memory {
 			pulse = pulse && v
 		}
-		for _, output := range curr.Outputs {
-			queue = append(queue, Signal{name, output, !pulse})
-		}
-	case '*':
-		for _, output := range curr.Outputs {
-			queue = append(queue, Signal{name, output, false})
-		}
+		return getSignals(name, curr.Outputs, !pulse)
 	}
-	return queue
+	return getSignals(name, curr.Outputs, false)
 }
 
 func solve() {
