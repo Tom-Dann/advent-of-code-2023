@@ -76,24 +76,21 @@ func (modules Modules) process(name string) []Signal {
 		for _, output := range curr.Outputs {
 			queue = append(queue, Signal{name, output, !pulse})
 		}
+	case '*':
+		for _, output := range curr.Outputs {
+			queue = append(queue, Signal{name, output, false})
+		}
 	}
 	return queue
 }
 
 func solve() {
 	modules := parseInput()
-	unfinished := true
 	cycles := make([]int, 4)
 	nodes := []string{"dl", "ns", "bh", "vd"}
 	low, high := 0, 0
-	for i := 1; i <= 1000 || unfinished; i++ {
-		if i <= 1000 {
-			low++
-		}
-		queue := []Signal{}
-		for _, dest := range modules["broadcaster"].Outputs { // Initial button press
-			queue = append(queue, Signal{"broadcaster", dest, false})
-		}
+	for i := 1; i <= 1000 || slices.Contains(cycles, 0); i++ {
+		queue := []Signal{{"button", "broadcaster", false}} // Initial button press
 		for len(queue) > 0 {
 			next := queue[0]
 			queue = queue[1:]
@@ -111,9 +108,7 @@ func solve() {
 				if cycles[index] == 0 {
 					cycles[index] = i
 				}
-				unfinished = slices.Contains(cycles, 0)
 			}
-
 			modules.sendSignal(next)
 			queue = append(queue, modules.process(next.Dest)...)
 		}
@@ -123,8 +118,7 @@ func solve() {
 }
 
 func printMermaid() { // Used for inspecting graph manually for part 2
-	fmt.Println("```mermaid")
-	fmt.Println("graph TD;")
+	fmt.Println("```mermaid\ngraph TD;")
 	modules := parseInput()
 	for source, m := range modules {
 		sourceName := fmt.Sprintf("%s[%s%s]", source, string(m.Type), source)
