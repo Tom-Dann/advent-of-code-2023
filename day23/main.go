@@ -73,8 +73,8 @@ func search(grid []string, part1 bool) int {
 		curr := queue[len(queue)-1]
 		queue = queue[:len(queue)-1]
 		head := curr[len(curr)-1]
-		if head.y == len(grid)-1 {
-			dist := 0
+		dist, last := graph[head][Point{len(grid) - 2, len(grid) - 1}]
+		if last {
 			for i := 0; i < len(curr)-1; i++ {
 				dist += graph[curr[i]][curr[i+1]]
 			}
