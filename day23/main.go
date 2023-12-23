@@ -49,14 +49,15 @@ func (path Path) getNext(grid []string, part1 bool) []Path {
 }
 
 func search(grid []string, part1 bool) int {
-	graph := Graph{Point{1, 0}: {}}
-	queue := []Path{{Point{1, 0}}}
+	start, finish := Point{1, 0}, Point{len(grid) - 2, len(grid) - 1}
+	graph := Graph{start: {}}
+	queue := []Path{{start}}
 	for len(queue) > 0 { // Create graph of distances between graph vertices
 		curr := queue[len(queue)-1]
 		queue = queue[:len(queue)-1]
 		next := curr.getNext(grid, part1)
 		vertex := curr[len(curr)-1]
-		if ((vertex.y == len(grid)-1 || vertex.y == 0) && len(curr) > 1) || len(next) > 1 { // At a new crossroads or start/end
+		if ((vertex == start || vertex == finish) && len(curr) > 1) || len(next) > 1 { // At a new crossroads or start/end
 			_, visited := graph[vertex]
 			if !visited {
 				graph[vertex] = Distances{}
@@ -68,12 +69,12 @@ func search(grid []string, part1 bool) int {
 		}
 	}
 	max := 0
-	queue = []Path{{Point{1, 0}}}
+	queue = []Path{{start}}
 	for len(queue) > 0 { // Depth-first search on graph of distances
 		curr := queue[len(queue)-1]
 		queue = queue[:len(queue)-1]
 		head := curr[len(curr)-1]
-		dist, last := graph[head][Point{len(grid) - 2, len(grid) - 1}]
+		dist, last := graph[head][finish]
 		if last {
 			for i := 0; i < len(curr)-1; i++ {
 				dist += graph[curr[i]][curr[i+1]]
