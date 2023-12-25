@@ -37,3 +37,4 @@ Then go to that folder and run the `main.go` solution
 - [`Day 22`](day22/main.go) | $\color{yellow}{**}$
 - [`Day 23`](day23/main.go) | $\color{yellow}{**}$
 - [`Day 24`](day24/main.go) | $\color{yellow}{**}$
+- [`Day 25`](day24/main.go) | $\color{yellow}{**}$
