@@ -18,13 +18,13 @@ func parseLine(line string) Hailstone {
 }
 
 func getLine(stone Hailstone) (float64, float64) {
-	m := float64(stone.vel.y) / float64(stone.vel.x)
-	c := float64(stone.pos.y) - m*float64(stone.pos.x) // c=y-mx
+	m := stone.vel.y / stone.vel.x
+	c := stone.pos.y - m*stone.pos.x // c=y-mx
 	return m, c
 }
 
 func intersect(s Hailstone, t Hailstone) bool {
-	min, max := float64(200000000000000), float64(400000000000000)
+	min, max := 2e14, 4e14
 	a, c := getLine(s)
 	b, d := getLine(t)
 	if a == b {
@@ -33,8 +33,8 @@ func intersect(s Hailstone, t Hailstone) bool {
 	x := (d - c) / (a - b)
 	y := a*x + c
 	return x >= min && y >= min && x <= max && y <= max &&
-		(math.Signbit(y-float64(s.pos.y)) == math.Signbit(float64(s.vel.y))) &&
-		(math.Signbit(y-float64(t.pos.y)) == math.Signbit(float64(t.vel.y)))
+		math.Signbit(y-s.pos.y) == math.Signbit(s.vel.y) &&
+		math.Signbit(y-t.pos.y) == math.Signbit(t.vel.y)
 }
 
 func solve(lines []string) {
@@ -61,8 +61,8 @@ func solve(lines []string) {
 	throw.pos.y = a.pos.y
 
 	b, c := stones[0], stones[1]
-	t1 := (float64(throw.pos.y) - float64(b.pos.y)) / (float64(b.vel.y) - float64(throw.vel.y))
-	t2 := (float64(throw.pos.y) - float64(c.pos.y)) / (float64(c.vel.y) - float64(throw.vel.y))
+	t1 := (throw.pos.y - b.pos.y) / (b.vel.y - throw.vel.y)
+	t2 := (throw.pos.y - c.pos.y) / (c.vel.y - throw.vel.y)
 	throw.vel.x = (b.pos.x - c.pos.x + t1*b.vel.x - t2*c.vel.x) / (t1 - t2)
 	throw.vel.z = (b.pos.z - c.pos.z + t1*b.vel.z - t2*c.vel.z) / (t1 - t2)
 	throw.pos.x = b.pos.x + t1*(b.vel.x-throw.vel.x)
